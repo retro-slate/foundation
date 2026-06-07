@@ -123,10 +123,20 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+ALLOWED_HOSTS = [
+    "api.retroslate.com",
+    ".onrender.com",
+]
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
     "https://retroslate.com",
     "https://www.retroslate.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://retroslate.com",
+    "https://www.retroslate.com",
+    "https://api.retroslate.com",
 ]
 
 from pathlib import Path
