@@ -1,28 +1,16 @@
-# Python
-backend/venv/
-backend/__pycache__/
-backend/**/*.pyc
-
-# Django
-backend/staticfiles/
-backend/media/
-backend/db.sqlite3
-
-# Environment
-.env
-.env.local
-.env.production
-backend/.env
-frontend/.env.local
-
-# Node
 frontend/node_modules/
 frontend/.next/
 frontend/out/
 
-# Mac
-.DS_Store
+backend/venv/
+backend/staticfiles/
+backend/db.sqlite3
+backend/**/__pycache__/
+backend/**/*.pyc
 
-# IDE
-.vscode/
-.idea/
+.env
+.env.local
+backend/.env
+frontend/.env.local
+
+.DS_Store
