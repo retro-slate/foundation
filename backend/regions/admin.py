@@ -14,3 +14,4 @@ class RegionAdmin(admin.ModelAdmin):
     list_filter = ("region_type", "data_status")
     search_fields = ("name", "slug")
     prepopulated_fields = {"slug": ("name",)}
+    autocomplete_fields = ("parent_region",)
