@@ -292,7 +292,17 @@ export default function Page() {
           <EmptyState title="Explore is offline" description={error} />
         ) : null}
 
-        {!isLoading && !error && filteredResults.length === 0 ? (
+        {!isLoading && !error && results.length === 0 ? (
+          <EmptyState
+            title="No results yet."
+            description="Data will appear here as the Foundation database grows."
+          />
+        ) : null}
+
+        {!isLoading &&
+        !error &&
+        results.length > 0 &&
+        filteredResults.length === 0 ? (
           <EmptyState
             title="No matching results"
             description="Try a different search term or switch the content type filter."
