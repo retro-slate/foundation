@@ -1,8 +1,6 @@
-from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 
 from django.db import transaction
-from django.utils import timezone
 
 from ghi.models import (
     ConversionRule,
@@ -34,15 +32,6 @@ CATEGORY_SCORE_FIELDS = {
     "economic-stability": "economic_stability_score",
     "governance": "governance_score",
 }
-
-
-@dataclass
-class GHICalculationResult:
-    snapshot: GHIScoreSnapshot
-    metric_scores_created: int
-    metric_scores_updated: int
-    missing_metric_count: int
-    missing_rule_count: int
 
 
 class GHICalculationError(Exception):
@@ -112,6 +101,11 @@ def calculate_normalized_score(raw_value, rule):
 
         distance = abs(raw_value - target)
         return quantize_score(Decimal("100") - ((distance / range_width) * 100))
+
+    # Custom formulas are intentionally skipped until a safe formula evaluator
+    # and review workflow are added.
+    if rule.rule_type == ConversionRule.RuleType.CUSTOM_FORMULA:
+        return None
 
     return None
 
@@ -202,7 +196,6 @@ def calculate_ghi_for_region_year(region_slug, year):
             metric_value=metric_value,
             defaults={
                 "normalized_score": normalized_score,
-                "calculated_at": timezone.now(),
             },
         )
 
@@ -280,7 +273,7 @@ def calculate_ghi_for_region_year(region_slug, year):
         ),
     }
 
-    snapshot, _ = GHIScoreSnapshot.objects.update_or_create(
+    snapshot, snapshot_created = GHIScoreSnapshot.objects.update_or_create(
         region=region,
         year=year,
         methodology_version=methodology,
@@ -290,10 +283,18 @@ def calculate_ghi_for_region_year(region_slug, year):
     region.current_ghi_score = overall_score
     region.save(update_fields=["current_ghi_score", "updated_at"])
 
-    return GHICalculationResult(
-        snapshot=snapshot,
-        metric_scores_created=created_count,
-        metric_scores_updated=updated_count,
-        missing_metric_count=missing_metric_count,
-        missing_rule_count=missing_rule_count,
-    )
+    return {
+        "region": region,
+        "year": year,
+        "methodology_version": methodology,
+        "snapshot": snapshot,
+        "snapshot_created": snapshot_created,
+        "overall_score": overall_score,
+        "data_completeness": data_completeness,
+        "total_active_metrics": total_active_metrics,
+        "usable_metric_scores": total_scored_metrics,
+        "metric_scores_created": created_count,
+        "metric_scores_updated": updated_count,
+        "missing_metric_values": missing_metric_count,
+        "missing_conversion_rules": missing_rule_count,
+    }

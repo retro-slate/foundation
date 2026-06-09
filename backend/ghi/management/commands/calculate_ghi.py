@@ -11,7 +11,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--region",
             required=True,
-            help="Region slug, for example: kerala",
+            help="Region slug, for example: india",
         )
         parser.add_argument(
             "--year",
@@ -34,20 +34,25 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Calculated GHI for {result.snapshot.region.name} "
+                f"Calculated GHI for {result['region'].name} "
                 f"({year}) using methodology "
-                f"{result.snapshot.methodology_version.version}."
+                f"{result['methodology_version'].version}."
             )
         )
-        self.stdout.write(f"Overall score: {result.snapshot.overall_score}")
-        self.stdout.write(f"Data completeness: {result.snapshot.data_completeness}%")
+        self.stdout.write(f"Overall score: {result['overall_score']}")
+        self.stdout.write(f"Data completeness: {result['data_completeness']}%")
         self.stdout.write(
             "Metric scores: "
-            f"{result.metric_scores_created} created, "
-            f"{result.metric_scores_updated} updated"
+            f"{result['metric_scores_created']} created, "
+            f"{result['metric_scores_updated']} updated"
         )
         self.stdout.write(
             "Missing data: "
-            f"{result.missing_metric_count} metric values, "
-            f"{result.missing_rule_count} conversion rules"
+            f"{result['missing_metric_values']} metric values, "
+            f"{result['missing_conversion_rules']} conversion rules"
+        )
+        self.stdout.write(
+            "Usable metrics: "
+            f"{result['usable_metric_scores']} of "
+            f"{result['total_active_metrics']}"
         )
